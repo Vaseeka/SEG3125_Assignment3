@@ -6,7 +6,7 @@ export default function PauseScreen({ seconds, moves, matchedPairs, totalPairs, 
     <OverlayBox>
       <h2 className="title title-display">Paused</h2>
 
-      <div className="result-stats">
+      <div className="result-stats mb-3">
         <div className="stat-chip">
           <p className="stat-label">Time</p>
           <p className="stat-value">{formatTime(seconds)}</p>

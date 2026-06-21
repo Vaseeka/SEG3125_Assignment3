@@ -3,9 +3,9 @@ import OverlayBox from "./OverlayBox";
 export default function TitleScreen({ onPlay, onHowToPlay }) {
   return (
     <OverlayBox>
-      <h1 className="title title-display">Memory Match</h1>
+      <h1 className="title title-display mb-4">Memory Match</h1>
 
-      <button className="primary-button" onClick={onPlay}>
+      <button className="primary-button action-gap" onClick={onPlay}>
         <i className="ti ti-player-play" aria-hidden="true"></i>
         Play
       </button>

@@ -164,10 +164,10 @@ export default function App() {
       {boardVisible && (
         <>
           <div className="stats-bar">
-            <span>Time {formatTime(seconds)}</span>
-            <span>Moves {moves}</span>
+            <span>Time: {formatTime(seconds)}</span>
+            <span>Moves: {moves}</span>
             <span>
-              Found {matchedPairs}/{totalPairs}
+              Found: {matchedPairs}/{totalPairs}
             </span>
             {phase === "playing" && (
               <button className="pause-button" onClick={() => setPhase("paused")}>

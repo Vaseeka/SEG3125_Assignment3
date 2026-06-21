@@ -47,7 +47,7 @@ export default function SetupScreen({ level, setLevel, theme, setTheme, onStart,
         </div>
       </div>
 
-      <div className="button-row">
+      <div className="button-row mt-3">
         <button className="secondary-button" onClick={onBack}>
           <i className="ti ti-arrow-left" aria-hidden="true"></i>
           Back

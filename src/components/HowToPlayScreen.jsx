@@ -5,14 +5,14 @@ export default function HowToPlayScreen({ onBack }) {
     <OverlayBox>
       <h2 className="title title-display">How to play</h2>
       <p className="how-to-text">
-        Memory Match is a memory matching game. Cards are placed face-down in a
-        grid. Flip two cards at a time to look for a matching pair — if they
-        match, they're cleared from the board. If they don't, they flip back
-        over and you try again. Clear every pair to win.
+        Match cards with the matching images by clicking on a face down card
+        to flip it over! You can flip a maximum of two cards at a time. If both
+        flipped cards match then they are removed from the board. Otherwise,
+        they flip back over. Find every pair and clear the board to win!
       </p>
       <p className="how-to-text">
-        Choose a game (Mario, Kirby, or Pokemon) and a difficulty before you
-        start — harder difficulties have more cards to match.
+        You can select three themes and difficulties before beggining a game.
+        Harder difficulties have more cards.
       </p>
       <button className="secondary-button" onClick={onBack}>
         <i className="ti ti-arrow-left" aria-hidden="true"></i>

@@ -40,6 +40,7 @@
   --font-size-subtitle: 18px;
   --font-size-body: 14px;
   --font-size-button: 18px;
+  --font-size-button-primary: 24px;
   --font-size-board: 16px;
 
   /* Hover effects */
@@ -117,6 +118,15 @@ body.is-game::before {
 
 .stats-bar span {
   flex: 0 0 auto;
+}
+
+/* Extra breathing room above a screen's primary action area, on top
+   of the standard .overlay-box gap. Opt-in via this class (rather
+   than baked into .primary-button/.button-row directly) so it only
+   applies where it's deliberately added — those classes get reused
+   in row layouts elsewhere where this would misalign buttons. */
+.action-gap {
+  margin-top: 20px;
 }
 
 .pause-button {
@@ -461,8 +471,8 @@ body.is-game::before {
   justify-content: center;
   gap: 8px;
 
-  min-height: 70px;
-  padding: 18px 28px;
+  min-height:60px;
+  padding: 18px 20px;
 
   border-radius: 999px;
   border: none;
@@ -471,7 +481,7 @@ body.is-game::before {
   color: var(--color-button-text);
 
   font-family: var(--font-body);
-  font-size: var(--font-size-button);
+  font-size: var(--font-size-button-primary);
   font-weight: 700;
 
   cursor: pointer;
