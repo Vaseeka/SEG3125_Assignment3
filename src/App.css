@@ -1,184 +1,441 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
-
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+:root {
+  --color-bg: #fdeff4;
+  --color-surface: #ffffff;
+  --color-text: #1d1d1f;
+  --color-text-muted: #6b6b6b;
+  --color-accent: #185fa5;
+  --color-accent-hover: #0f4677;
+  --color-accent-text: #ffffff;
+  --color-radio: #d4537e;
+  --color-radio-bg: #fbeaf0;
+  --color-matched: #639922;
+  --color-border: #e3e1da;
+  --radius: 12px;
+  --font-display: "Jersey 10", system-ui, sans-serif;
+  --font-body: "Share Tech Mono", monospace;
 }
 
-.hero {
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
   position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
+  overflow-x: hidden;
 }
 
-#center {
+/* FIGURE/GROUND: a blurred decorative photo sits behind all content so
+   the foreground (cards, boxes, buttons) stays the clear "figure"
+   while the page still has thematic visual texture. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: -20px;
+  background: url("/images/background.png") center / cover no-repeat;
+  filter: blur(4px);
+  z-index: -1;
+}
+
+.app {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+/* ---- Board / stats bar (visible once a game has started) ---- */
+
+.stats-bar {
   display: flex;
-  flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+  align-items: center;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--color-radio);
+  margin-bottom: 14px;
 }
 
-#next-steps {
-  display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+.stats-bar span {
+  flex: 0 0 auto;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+.pause-button {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
+.pause-button:hover {
+  background: var(--color-accent-hover);
+}
+
+.pause-button:active {
+  transform: scale(0.97);
+}
+
+.board {
+  transition: filter 0.25s ease;
+}
+
+.board.is-blurred {
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+/* PROXIMITY: gap controls how strongly cards read as one group; padding
+   around the whole grid adds -ve space. */
+.card-grid {
+  display: grid;
   gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+  padding: 24px;
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+.status-text {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-radio);
+  margin: 4px 0 0;
 }
 
-.ticks {
+/* FIGURE/GROUND + CLOSURE: perspective + rotateY makes the card read as
+   one object turning over rather than two images swapping. */
+.card {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  perspective: 600px;
+  transition: transform 0.15s, filter 0.3s, opacity 0.3s;
+}
+
+.card:not(.is-matched):not(:disabled):hover {
+  transform: translateY(-3px);
+}
+
+.card:not(.is-matched):not(:disabled):hover .card-inner {
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+}
+
+.card:not(.is-matched):not(:disabled):hover .card-front {
+  background: #e9e8e4;
+}
+
+.card-inner {
   position: relative;
   width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.45s cubic-bezier(0.4, 0.2, 0.2, 1), box-shadow 0.15s;
+  border-radius: var(--radius);
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+.card-inner.is-flipped {
+  transform: rotateY(180deg);
+}
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+.card-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  backface-visibility: hidden;
+  border: 1px solid var(--color-border);
+  transition: background 0.15s;
+}
+
+.card-front {
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-family: var(--font-display);
+  font-size: 28px;
+}
+
+.card-back {
+  background: #ffffff;
+  transform: rotateY(180deg);
+  padding: 10%;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Match feedback, two stages:
+   1) is-matched: green glow on the card border (done immediately)
+   2) is-faded: opacity drops to 0 a beat later, "clearing" the pair
+      while still holding its grid slot so the layout doesn't reflow. */
+.card.is-matched .card-face {
+  border-color: var(--color-matched);
+  box-shadow: 0 0 0 2px var(--color-matched);
+}
+
+.card.is-matched {
+  cursor: default;
+  transform: none;
+}
+
+.card.is-matched .card-inner {
+  box-shadow: none;
+}
+
+.card.is-faded {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+/* ---- Overlay box: pop-up card look for title, how-to-play,
+   setup, pause, and win screens ---- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(10, 10, 14, 0.45);
+  backdrop-filter: blur(3px);
+  padding: 20px;
+  z-index: 10;
+}
+
+.overlay-box {
+  width: 100%;
+  max-width: 380px;
+  min-height: 360px;
+  background: var(--color-surface);
+  border-radius: 18px;
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 500;
+  margin: 0;
+  text-align: center;
+}
+
+.title-display {
+  font-family: var(--font-display);
+  font-size: 38px;
+  letter-spacing: 0.02em;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--color-text-muted);
+  margin: -8px 0 4px;
+  font-size: 13px;
+}
+
+.how-to-text {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.last-session {
+  background: #f5f4f0;
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+/* Common-region grouping: making a filled, bordered container around each
+   section (Theme, Difficulty) to better seperate them compared to before */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--color-radio-bg);
+  border: 1.5px solid var(--color-radio);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.field-label {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* SIMILARITY: option radio button share the same colour. nowrap + min-width: 0
+   guarantees all 3 options in a group stay on one row regardless of
+   container width, with the icon stacked above the label inside each
+   pill. */
+.option-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.option-pill {
+  flex: 1;
+  min-width: 0;
+  padding: 12px 6px;
+  border-radius: 14px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.option-pill i {
+  font-size: 20px;
+}
+
+.pill-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+}
+
+.option-pill.selected {
+  background: var(--color-radio-bg);
+  border-color: var(--color-radio);
+  color: var(--color-radio);
+  font-weight: 700;
+}
+
+.option-pill:not(.selected):hover {
+  border-color: var(--color-radio);
+  background: var(--color-radio-bg);
+}
+
+.star-row {
+  display: flex;
+  gap: 2px;
+  color: var(--color-radio);
+}
+
+.star-row i {
+  font-size: 13px;
+}
+
+/* Scale signals importance: primary is the larger, bolder
+   button; secondary is visually smaller but the same colour */
+.primary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 17px;
+  border-radius: 999px;
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.primary-button:hover {
+  background: var(--color-accent-hover);
+}
+
+.primary-button:active {
+  transform: scale(0.98);
+}
+
+.secondary-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px;
+  border-radius: 999px;
+  border: none;
+  background: var(--color-accent);
+  color: var(--color-accent-text);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: background 0.15s, opacity 0.15s, transform 0.1s;
+}
+
+.secondary-button:hover {
+  background: var(--color-accent-hover);
+  opacity: 1;
+}
+
+.secondary-button:active {
+  transform: scale(0.98);
+}
+
+/* Used when two buttons (e.g. Start / Back) should sit side by side
+   instead of stacking on top of each other */
+.button-row {
+  display: flex;
+  gap: 8px;
+}
+
+.button-row .primary-button,
+.button-row .secondary-button {
+  flex: 1;
+  margin-top: 0;
+}
+
+.result-stats {
+  display: flex;
+  gap: 8px;
+}
+
+.stat-chip {
+  flex: 1;
+  background: #f5f4f0;
+  border-radius: var(--radius);
+  padding: 10px;
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin: 0 0 4px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 22px;
+  margin: 0;
 }
