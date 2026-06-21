@@ -17,6 +17,7 @@
   --color-text-radio-hover: #ffffff;
   --color-radio-bg-selected: #ffffff;
   --color-radio-bg-unselected: #f7a5c0;
+
   /* Shared light-grey "container" colour: used for the Theme/Difficulty
      groups on Setup AND the stat-chips on Pause/Win, so they read as
      the same kind of grouped surface everywhere they appear. */
@@ -36,9 +37,10 @@
 
   /* Typography */
   --font-size-title: 38px;
-  --font-size-subtitle: 22px;
-  --font-size-body: 16px;
-  --font-size-button: 16px;
+  --font-size-subtitle: 18px;
+  --font-size-body: 14px;
+  --font-size-button: 18px;
+  --font-size-board: 16px;
 
   /* Hover effects */
   --hover-lift: -3px;
@@ -107,7 +109,7 @@ body.is-game::before {
   display: flex;
   align-items: center;
   gap: 16px;
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-board);
   color: var(--color-text);
   font-variant-numeric: tabular-nums; /* stops the timer's digit-width changes from nudging Moves/Found/Pause */
   margin-bottom: 14px;
@@ -200,7 +202,7 @@ body.is-game::before {
   width: calc(100% - 32px);
   max-width: 640px;
   text-align: center;
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-board);
   color: var(--color-text);
   margin: 0;
   pointer-events: none;
@@ -330,16 +332,12 @@ body.is-game::before {
 }
 
 .title {
-  font-size: var(--font-size-subtitle);
-  font-weight: 500;
-  margin: 0;
-  text-align: center;
-}
-
-.title-display {
   font-family: var(--font-display);
   font-size: var(--font-size-title);
+  font-weight: 500;
   letter-spacing: 0.02em;
+  margin: 0;
+  text-align: center;
 }
 
 .subtitle {
@@ -354,15 +352,6 @@ body.is-game::before {
   line-height: 1.6;
   color: var(--color-text-muted);
   margin: 0;
-}
-
-.last-session {
-  background: var(--color-container-bg);
-  border-radius: var(--radius);
-  padding: 8px 12px;
-  font-size: 12px;
-  color: var(--color-text-muted);
-  text-align: center;
 }
 
 /* Common-region grouping: a filled, bordered container around each
@@ -380,7 +369,7 @@ body.is-game::before {
 }
 
 .field-label {
-  font-size: var(--font-size-body);
+  font-size: var(--font-size-subtitle);
   color: var(--color-text-muted);
   margin: 0;
 }
@@ -534,6 +523,15 @@ body.is-game::before {
     background-color 0.15s ease;
 }
 
+/* For secondary buttons that stack alone (not inside .button-row) —
+   shrinks to fit its content instead of stretching full-width like
+   the primary button above it, so it visually reads as the lesser
+   action. */
+.secondary-button--compact {
+  align-self: center;
+  padding: 14px 32px;
+}
+
 .secondary-button:hover {
   background: var(--color-button-hover);
   transform: translateY(var(--hover-lift));
@@ -574,13 +572,13 @@ body.is-game::before {
 }
 
 .stat-label {
-  font-size: 12px;
+  font-size: var(--font-size-body);
   color: var(--color-text-muted);
   margin: 0 0 4px;
 }
 
 .stat-value {
-  font-family: var(--font-display);
-  font-size: 22px;
+  font-family: var(--font-size-body);
+  font-size: var(--font-size-body);
   margin: 0;
 }

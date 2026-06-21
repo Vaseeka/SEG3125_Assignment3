@@ -8,7 +8,7 @@ export default function SetupScreen({ level, setLevel, theme, setTheme, onStart,
       <h2 className="title title-display">Setup</h2>
 
       <div className="field-group">
-        <p className="field-label">Game</p>
+        <p className="field-label">Select a Theme</p>
         <div className="option-row">
           {Object.entries(THEMES).map(([key, val]) => (
             <button
@@ -24,7 +24,7 @@ export default function SetupScreen({ level, setLevel, theme, setTheme, onStart,
       </div>
 
       <div className="field-group">
-        <p className="field-label">Difficulty</p>
+        <p className="field-label">Select a Difficulty</p>
         <div className="option-row">
           {Object.entries(LEVELS).map(([key, val]) => (
             <button

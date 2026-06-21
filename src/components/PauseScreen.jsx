@@ -33,7 +33,7 @@ export default function PauseScreen({ seconds, moves, matchedPairs, totalPairs, 
       </button>
       <button className="secondary-button" onClick={onQuit}>
         <i className="ti ti-home" aria-hidden="true"></i>
-        Quit to menu
+        Return to Title Screen
       </button>
     </OverlayBox>
   );

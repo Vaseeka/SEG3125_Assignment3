@@ -99,10 +99,10 @@ export default function App() {
     const nextFlipped = [...flippedIds, card.id];
     setDeck(nextDeck);
     setFlippedIds(nextFlipped);
+    setMoves((m) => m + 1); // every flip is a move now, not just the 2nd of a pair
 
     if (nextFlipped.length !== 2) return;
 
-    setMoves((m) => m + 1);
     setLocked(true);
     const [firstId, secondId] = nextFlipped;
     const first = nextDeck.find((c) => c.id === firstId);
