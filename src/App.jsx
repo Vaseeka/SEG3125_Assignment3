@@ -20,12 +20,23 @@ import { buildDeck, formatTime } from "./utils/gameLogic";
     "playing" -> "won" (all pairs matched)
     "won" -> "playing" (Play again, same settings) or "title" (Quit)
 
-  WIN-CONDITION NOTE (for future me): matched pairs are tracked with a dedicated
-  `matchedPairs` counter that increments exactly once per confirmed
-  match, rather than being re-derived by filtering the deck array each
-  time. Re-deriving the count was the source of an earlier bug where the
-  game could report a win before every pair was actually matched and a
-  single authoritative counter removes that ambiguity entirely.
+  WIN-CONDITION NOTE (for future me): matched pairs are tracked with a
+  dedicated `matchedPairs` counter that increments exactly once per
+  confirmed match, rather than being re-derived by filtering the deck
+  array each time. Re-deriving the count was the source of an earlier
+  bug where the game could report a win before every pair was actually
+  matched — a single authoritative counter removes that ambiguity
+  entirely.
+
+  RESTART-FLASH FIX (for future me): `gameId` is bumped every time a new
+  game starts (Start / Restart / Play again) and passed as Board's
+  `key`. Without this, React would reuse the previous game's card DOM
+  elements for the new game (since card ids are always 0..N-1), and the
+  CSS flip transition would visibly animate those reused cards from
+  "flipped" back to "face down" instead of just starting face down —
+  a brief flash of the old game's revealed cards. Changing `key` forces
+  a full remount instead, so the new cards just appear face down with
+  no transition to animate.
 */
 
 const STATUS_DEFAULT = "Click on a ? card to reveal what it is";
@@ -45,10 +56,13 @@ export default function App() {
   const [locked, setLocked] = useState(false);
   const [result, setResult] = useState(null);
   const [statusText, setStatusText] = useState(STATUS_DEFAULT);
+  const [gameId, setGameId] = useState(0);
   const timerRef = useRef(null);
 
   const columns = LEVELS[level].cols;
   const totalPairs = LEVELS[level].pairs;
+  const boardVisible = phase === "playing" || phase === "paused" || phase === "won";
+  const boardBlurred = phase === "paused" || phase === "won";
 
   // Timer only runs while actively playing.
   useEffect(() => {
@@ -57,6 +71,13 @@ export default function App() {
     }
     return () => clearInterval(timerRef.current);
   }, [phase]);
+
+  // The blurred background photo (body::before in App.css) blurs less
+  // once a game is actually on screen, via the `.is-game` class — this
+  // is the only place that class gets toggled.
+  useEffect(() => {
+    document.body.classList.toggle("is-game", boardVisible);
+  }, [boardVisible]);
 
   function startGame() {
     setDeck(buildDeck(level, theme));
@@ -67,6 +88,7 @@ export default function App() {
     setSeconds(0);
     setLocked(false);
     setStatusText(STATUS_DEFAULT);
+    setGameId((id) => id + 1); // forces Board to remount, see note above
     setPhase("playing");
   }
 
@@ -137,9 +159,6 @@ export default function App() {
     }, 2000);
   }
 
-  const boardVisible = phase === "playing" || phase === "paused" || phase === "won";
-  const boardBlurred = phase === "paused" || phase === "won";
-
   return (
     <div className="app">
       {boardVisible && (
@@ -157,16 +176,24 @@ export default function App() {
               </button>
             )}
           </div>
+
+          {/* flex-centred in CSS so the grid sits in the same visual
+              centre of the screen regardless of how many rows the
+              current difficulty needs (see .board in App.css) */}
           <div className={`board ${boardBlurred ? "is-blurred" : ""}`}>
             <Board
+              key={gameId}
               deck={deck}
               columns={columns}
               fadedIds={fadedIds}
               onCardClick={handleCardClick}
               interactive={phase === "playing"}
             />
-            <p className="status-text">{statusText}</p>
           </div>
+
+          {/* Lives outside .board on purpose — see the comment on
+              .status-text in App.css for why. */}
+          <p className="status-text">{statusText}</p>
         </>
       )}
 

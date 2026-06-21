@@ -23,7 +23,7 @@ export default function PauseScreen({ seconds, moves, matchedPairs, totalPairs, 
         </div>
       </div>
 
-      <button className="primary-button" onClick={onResume}>
+      <button className="secondary-button" onClick={onResume}>
         <i className="ti ti-player-play" aria-hidden="true"></i>
         Resume
       </button>

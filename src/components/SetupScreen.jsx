@@ -52,7 +52,7 @@ export default function SetupScreen({ level, setLevel, theme, setTheme, onStart,
           <i className="ti ti-arrow-left" aria-hidden="true"></i>
           Back
         </button>
-        <button className="primary-button" onClick={onStart}>
+        <button className="secondary-button" onClick={onStart}>
           <i className="ti ti-player-play" aria-hidden="true"></i>
           Start
         </button>

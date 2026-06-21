@@ -1,18 +1,52 @@
 :root {
   --color-bg: #fdeff4;
   --color-surface: #ffffff;
+
   --color-text: #1d1d1f;
   --color-text-muted: #6b6b6b;
-  --color-accent: #185fa5;
-  --color-accent-hover: #0f4677;
-  --color-accent-text: #ffffff;
-  --color-radio: #d4537e;
-  --color-radio-bg: #fbeaf0;
-  --color-matched: #639922;
+
+  /* Navigation / action buttons */
+  --color-button: #23aacc;
+  --color-button-hover: #127796;
+  --color-button-text: #ffffff;
+
+  /* Radio buttons */
+  --color-text-radio: #1d1d1f;
+  --color-radio: #de4578;
+  --color-radio-bg: #040404;
+  --color-text-radio-hover: #ffffff;
+  --color-radio-bg-selected: #ffffff;
+  --color-radio-bg-unselected: #f7a5c0;
+  /* Shared light-grey "container" colour: used for the Theme/Difficulty
+     groups on Setup AND the stat-chips on Pause/Win, so they read as
+     the same kind of grouped surface everywhere they appear. */
+  --color-container-bg: #f5f4f0;
+
+  --color-radio-hover-bg: #e25c88;
+  --color-radio-hover-shadow: rgba(0, 0, 0, 0.12);
+
+  --color-matched: #94c4c1;
   --color-border: #e3e1da;
+
+  /* Text that sits directly on top of the background photo (the
+     gameplay stats bar and the bottom status line) needs to stay
+     readable regardless of what's behind it, so it's pinned to white
+     rather than driven by the rest of the palette. */
+  --color-text-on-photo: #ffffff;
+
+  /* Typography */
+  --font-size-title: 38px;
+  --font-size-subtitle: 22px;
+  --font-size-body: 16px;
+  --font-size-button: 16px;
+
+  /* Hover effects */
+  --hover-lift: -3px;
+
   --radius: 12px;
+
   --font-display: "Jersey 10", system-ui, sans-serif;
-  --font-body: "Share Tech Mono", monospace;
+  --font-body: "Exo 2", sans-serif;
 }
 
 * {
@@ -30,22 +64,41 @@ body {
 
 /* FIGURE/GROUND: a blurred decorative photo sits behind all content so
    the foreground (cards, boxes, buttons) stays the clear "figure"
-   while the page still has thematic visual texture. */
+   while the page still has thematic visual texture.
+
+   Blur is heavier on the menu screens (title/setup/etc, where the
+   photo is purely decorative) and lighter once a game is in progress
+   (the `.is-game` class below, toggled by App.jsx) so the board reads
+   against a bit more visible texture instead of a near-flat blur. */
 body::before {
   content: "";
   position: fixed;
   inset: -20px;
   background: url("/images/background.png") center / cover no-repeat;
-  filter: blur(4px);
   z-index: -1;
+  filter: blur(6px);
+  transition: filter 0.3s ease;
 }
 
+body.is-game::before {
+  filter: blur(1.5px);
+}
+
+/* Flex column so the in-game board can grow to fill the remaining
+   vertical space (see .board below) and stay centred regardless of how
+   many rows the current difficulty needs. Extra bottom padding leaves
+   room for the status text, which is pinned to the bottom of the
+   viewport rather than living in normal document flow. */
 .app {
   position: relative;
   max-width: 640px;
   margin: 0 auto;
-  min-height: 100vh;
-  padding: 24px 16px;
+  height: 100vh;
+  height: 100dvh; /* better on mobile browsers with collapsing toolbars */
+  overflow: hidden;
+  padding: 24px 16px 64px;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ---- Board / stats bar (visible once a game has started) ---- */
@@ -54,8 +107,9 @@ body::before {
   display: flex;
   align-items: center;
   gap: 16px;
-  font-size: 13px;
-  color: var(--color-radio);
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums; /* stops the timer's digit-width changes from nudging Moves/Found/Pause */
   margin-bottom: 14px;
 }
 
@@ -68,26 +122,50 @@ body::before {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 14px;
+
+  padding: 10px 18px;
+
   border-radius: 999px;
-  border: 1.5px solid var(--color-accent);
-  background: var(--color-accent);
-  color: var(--color-accent-text);
+  border: none;
+
+  background: var(--color-button);
+  color: var(--color-button-text);
+
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: var(--font-size-button);
+
   cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .pause-button:hover {
-  background: var(--color-accent-hover);
+  background: var(--color-button-hover);
+  transform: translateY(var(--hover-lift));
+  filter: brightness(1.03);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 }
 
 .pause-button:active {
   transform: scale(0.97);
 }
 
+/* `flex: 1` lets this fill whatever vertical space is left in `.app`
+   after the stats bar, and centring it both ways means the card grid
+   sits in the same visual centre of the screen whether it's a short
+   4x2 Easy board or a taller 4x4 Hard board — the grid itself doesn't
+   need to know or care how many rows it has. */
 .board {
+  flex: 1;
+  min-height: 0; /* lets this flex child actually shrink instead of overflowing its parent */
+  container-type: size; /* turns .board into a sizing reference for the grid below */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: filter 0.25s ease;
 }
 
@@ -102,13 +180,30 @@ body::before {
   display: grid;
   gap: 8px;
   padding: 24px;
+  aspect-ratio: var(--cols) / var(--rows);
+  /* shrink to whichever of width or height is the tighter constraint */
+  width: min(100cqw, calc(100cqh * var(--cols) / var(--rows)));
+  max-width: 520px;
 }
 
+/* Pinned to the bottom of the viewport (not in normal document flow)
+   so it stays in the same spot regardless of how tall the card grid
+   above it is. Lives OUTSIDE `.board` on purpose — `.board` gets a CSS
+   `filter` during pause/win, and filters create a new containing block
+   for fixed-position descendants, which would otherwise make this
+   "fixed to the board" instead of "fixed to the viewport". */
 .status-text {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 640px;
   text-align: center;
-  font-size: 13px;
-  color: var(--color-radio);
-  margin: 4px 0 0;
+  font-size: var(--font-size-body);
+  color: var(--color-text);
+  margin: 0;
+  pointer-events: none;
 }
 
 /* FIGURE/GROUND + CLOSURE: perspective + rotateY makes the card read as
@@ -235,7 +330,7 @@ body::before {
 }
 
 .title {
-  font-size: 22px;
+  font-size: var(--font-size-subtitle);
   font-weight: 500;
   margin: 0;
   text-align: center;
@@ -243,7 +338,7 @@ body::before {
 
 .title-display {
   font-family: var(--font-display);
-  font-size: 38px;
+  font-size: var(--font-size-title);
   letter-spacing: 0.02em;
 }
 
@@ -251,18 +346,18 @@ body::before {
   text-align: center;
   color: var(--color-text-muted);
   margin: -8px 0 4px;
-  font-size: 13px;
+  font-size: var(--font-size-subtitle);
 }
 
 .how-to-text {
-  font-size: 13px;
+  font-size: var(--font-size-body);
   line-height: 1.6;
   color: var(--color-text-muted);
   margin: 0;
 }
 
 .last-session {
-  background: #f5f4f0;
+  background: var(--color-container-bg);
   border-radius: var(--radius);
   padding: 8px 12px;
   font-size: 12px;
@@ -270,20 +365,22 @@ body::before {
   text-align: center;
 }
 
-/* Common-region grouping: making a filled, bordered container around each
-   section (Theme, Difficulty) to better seperate them compared to before */
+/* Common-region grouping: a filled, bordered container around each
+   section (Theme, Difficulty) to better separate them visually. Uses
+   the same --color-container-bg as .stat-chip below so every
+   "grouped surface" in the app reads as one consistent visual
+   language, not just within this one screen. */
 .field-group {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background: var(--color-radio-bg);
-  border: 1.5px solid var(--color-radio);
+  background: var(--color-container-bg);
   border-radius: 14px;
   padding: 14px;
 }
 
 .field-label {
-  font-size: 13px;
+  font-size: var(--font-size-body);
   color: var(--color-text-muted);
   margin: 0;
 }
@@ -301,22 +398,31 @@ body::before {
 .option-pill {
   flex: 1;
   min-width: 0;
+
   padding: 12px 6px;
+
   border-radius: 14px;
-  border: 1.5px solid var(--color-border);
-  background: var(--color-surface);
-  color: var(--color-text);
+  border: 2px solid transparent;
+
+  background: var(--color-radio-bg-unselected);
+  color: var(--color-text-radio);
+
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: var(--font-size-body);
+  font-weight: 400;
+
   cursor: pointer;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-}
 
-.option-pill i {
-  font-size: 20px;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .pill-icon {
@@ -325,16 +431,27 @@ body::before {
   object-fit: contain;
 }
 
+.option-pill:hover {
+  color: var(--color-text-radio-hover);
+  transform: translateY(-3px);
+  background: var(--color-radio-hover-bg);
+  box-shadow: 0 8px 18px var(--color-radio-hover-shadow);
+}
+
 .option-pill.selected {
-  background: var(--color-radio-bg);
+  background: var(--color-radio-bg-selected);
   border-color: var(--color-radio);
   color: var(--color-radio);
   font-weight: 700;
 }
 
-.option-pill:not(.selected):hover {
-  border-color: var(--color-radio);
-  background: var(--color-radio-bg);
+.option-pill.selected:hover {
+  color: var(--color-text-radio-hover);
+  transform: translateY(-3px);
+  background: var(--color-radio-hover-bg);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.12),
+    0 0 0 3px rgba(212, 83, 126, 0.15);
 }
 
 .star-row {
@@ -354,21 +471,35 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 17px;
+
+  min-height: 70px;
+  padding: 18px 28px;
+
   border-radius: 999px;
   border: none;
-  background: var(--color-accent);
-  color: var(--color-accent-text);
+
+  background: var(--color-button);
+  color: var(--color-button-text);
+
   font-family: var(--font-body);
-  font-size: 17px;
+  font-size: var(--font-size-button);
   font-weight: 700;
+
   cursor: pointer;
   margin-top: 4px;
-  transition: background 0.15s, transform 0.1s;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .primary-button:hover {
-  background: var(--color-accent-hover);
+  background: var(--color-button-hover);
+  transform: translateY(var(--hover-lift));
+  filter: brightness(1.03);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 }
 
 .primary-button:active {
@@ -380,22 +511,34 @@ body::before {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 9px;
+
+  min-height: 40px;
+  padding: 10px 18px;
+
   border-radius: 999px;
   border: none;
-  background: var(--color-accent);
-  color: var(--color-accent-text);
+
+  background: var(--color-button);
+  color: var(--color-button-text);
+
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: calc(var(--font-size-button) - 1px);
   font-weight: 600;
+
   cursor: pointer;
-  opacity: 0.85;
-  transition: background 0.15s, opacity 0.15s, transform 0.1s;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    filter 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .secondary-button:hover {
-  background: var(--color-accent-hover);
-  opacity: 1;
+  background: var(--color-button-hover);
+  transform: translateY(var(--hover-lift));
+  filter: brightness(1.03);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
 }
 
 .secondary-button:active {
@@ -406,13 +549,15 @@ body::before {
    instead of stacking on top of each other */
 .button-row {
   display: flex;
-  gap: 8px;
+  gap: 16px;
 }
 
-.button-row .primary-button,
+.button-row .primary-button {
+  flex: 1.6;
+}
+
 .button-row .secondary-button {
   flex: 1;
-  margin-top: 0;
 }
 
 .result-stats {
@@ -422,7 +567,7 @@ body::before {
 
 .stat-chip {
   flex: 1;
-  background: #f5f4f0;
+  background: var(--color-container-bg);
   border-radius: var(--radius);
   padding: 10px;
   text-align: center;
