@@ -10,7 +10,7 @@ import { buildDeck, formatTime } from "./utils/gameLogic";
 
 const STATUS_DEFAULT = "Click on a ? card to reveal what it is";
 const STATUS_MATCH = "You found a match!";
-const STATUS_MISMATCH = "The cards you selected don't match!";
+const STATUS_MISMATCH = "The selected cards don't match";
 
 export default function App() {
   const [phase, setPhase] = useState("title");
@@ -29,6 +29,7 @@ export default function App() {
   const timerRef = useRef(null);
 
   const columns = LEVELS[level].cols;
+  const rows = LEVELS[level].rows;
   const totalPairs = LEVELS[level].pairs;
   const boardVisible = phase === "playing" || phase === "paused" || phase === "won";
   const boardBlurred = phase === "paused" || phase === "won";
@@ -110,7 +111,7 @@ export default function App() {
   }
 
   function handleMismatch(firstId, secondId) {
-    // Mismatched cards stay face-up for 2 seconds before flipping back over
+    // Mismatched cards stay face-up for a bit before flipping back over
     // The user can't flip any other cards during this period
     setTimeout(() => {
       setDeck((d) =>
@@ -119,7 +120,7 @@ export default function App() {
       setFlippedIds([]);
       setLocked(false);
       setStatusText(STATUS_DEFAULT);
-    }, 2000);
+    }, 1000);
   }
 
   return (
@@ -145,6 +146,7 @@ export default function App() {
               key={gameId}
               deck={deck}
               columns={columns}
+              rows={rows} 
               fadedIds={fadedIds}
               onCardClick={handleCardClick}
               interactive={phase === "playing"}

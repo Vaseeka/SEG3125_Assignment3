@@ -5,7 +5,7 @@ export default function HowToPlayScreen({ onBack }) {
     <OverlayBox>
       <h2 className="title title-display">How to play</h2>
       <p className="how-to-text">
-        Match cards with the matching images by clicking on a face down card
+        Match cards with matching images by clicking on a face down card
         to flip it over! You can flip a maximum of two cards at a time. If both
         flipped cards match then they are removed from the board. Otherwise,
         they flip back over. Find every pair and clear the board to win!
