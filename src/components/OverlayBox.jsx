@@ -1,5 +1,5 @@
-// Shared pop-up box shell used by SetupScreen, PauseScreen, and
-// WinScreen for consitent look
+// Pop-up page for non game board screens
+
 export default function OverlayBox({ children }) {
   return (
     <div className="overlay">

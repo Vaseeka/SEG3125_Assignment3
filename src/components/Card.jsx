@@ -1,5 +1,5 @@
-// A single memory card. Board.jsx renders one of these per card in the
-// deck with .map(). It renders itself based on the props it's given
+// Card component used by Board.jsx 
+
 export default function Card({ card, faded, interactive, onClick }) {
   const isFlipped = card.flipped || card.matched;
 

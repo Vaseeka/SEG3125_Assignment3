@@ -8,37 +8,6 @@ import WinScreen from "./components/WinScreen";
 import { LEVELS } from "./data/levels";
 import { buildDeck, formatTime } from "./utils/gameLogic";
 
-/*
-  App.jsx is the orchestrator: it owns the game state and decides which
-  screen to show. `phase` drives everything:
-
-    "title" -> "howtoplay" (Back returns to title)
-    "title" -> "setup" (Back returns to title)
-    "setup" -> "playing" (Start)
-    "playing" <-> "paused" (Pause / Resume)
-    "paused" -> "title" (Quit) or back to "playing" via Restart
-    "playing" -> "won" (all pairs matched)
-    "won" -> "playing" (Play again, same settings) or "title" (Quit)
-
-  WIN-CONDITION NOTE (for future me): matched pairs are tracked with a
-  dedicated `matchedPairs` counter that increments exactly once per
-  confirmed match, rather than being re-derived by filtering the deck
-  array each time. Re-deriving the count was the source of an earlier
-  bug where the game could report a win before every pair was actually
-  matched — a single authoritative counter removes that ambiguity
-  entirely.
-
-  RESTART-FLASH FIX (for future me): `gameId` is bumped every time a new
-  game starts (Start / Restart / Play again) and passed as Board's
-  `key`. Without this, React would reuse the previous game's card DOM
-  elements for the new game (since card ids are always 0..N-1), and the
-  CSS flip transition would visibly animate those reused cards from
-  "flipped" back to "face down" instead of just starting face down —
-  a brief flash of the old game's revealed cards. Changing `key` forces
-  a full remount instead, so the new cards just appear face down with
-  no transition to animate.
-*/
-
 const STATUS_DEFAULT = "Click on a ? card to reveal what it is";
 const STATUS_MATCH = "You found a match!";
 const STATUS_MISMATCH = "The cards you selected don't match!";
@@ -64,7 +33,7 @@ export default function App() {
   const boardVisible = phase === "playing" || phase === "paused" || phase === "won";
   const boardBlurred = phase === "paused" || phase === "won";
 
-  // Timer only runs while actively playing.
+  // Timer only runs while actively playing
   useEffect(() => {
     if (phase === "playing") {
       timerRef.current = setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -72,9 +41,7 @@ export default function App() {
     return () => clearInterval(timerRef.current);
   }, [phase]);
 
-  // The blurred background photo (body::before in App.css) blurs less
-  // once a game is actually on screen, via the `.is-game` class — this
-  // is the only place that class gets toggled.
+  // The blur effect is weaker if the user is on the game board screen
   useEffect(() => {
     document.body.classList.toggle("is-game", boardVisible);
   }, [boardVisible]);
@@ -88,7 +55,7 @@ export default function App() {
     setSeconds(0);
     setLocked(false);
     setStatusText(STATUS_DEFAULT);
-    setGameId((id) => id + 1); // forces Board to remount, see note above
+    setGameId((id) => id + 1);
     setPhase("playing");
   }
 
@@ -99,7 +66,7 @@ export default function App() {
     const nextFlipped = [...flippedIds, card.id];
     setDeck(nextDeck);
     setFlippedIds(nextFlipped);
-    setMoves((m) => m + 1); // every flip is a move now, not just the 2nd of a pair
+    setMoves((m) => m + 1); // every flip is counted as a move
 
     if (nextFlipped.length !== 2) return;
 
@@ -118,17 +85,13 @@ export default function App() {
   }
 
   function handleMatch(firstId, secondId) {
-    // Brief green flash (handled by .is-matched in CSS), then fade the
-    // pair out after a beat so the win moment doesn't feel instant.
+    // Greenish blue flash animation around the selected cards if they are a pair
     setTimeout(() => {
       setDeck((d) => d.map((c) => (c.id === firstId || c.id === secondId ? { ...c, matched: true } : c)));
       setFlippedIds([]);
       setLocked(false);
       setStatusText(STATUS_DEFAULT);
 
-      // The ONE place matched-pair progress is incremented. This is the
-      // single source of truth for both the "Found X/Y" display and the
-      // win check below — nothing else recomputes this count.
       setMatchedPairs((prevCount) => {
         const nextCount = prevCount + 1;
         if (nextCount === totalPairs) {
@@ -147,8 +110,8 @@ export default function App() {
   }
 
   function handleMismatch(firstId, secondId) {
-    // Mismatched cards stay face-up for 2s so the player can register
-    // them before they flip back; board stays locked the whole time.
+    // Mismatched cards stay face-up for 2 seconds before flipping back over
+    // The user can't flip any other cards during this period
     setTimeout(() => {
       setDeck((d) =>
         d.map((c) => (c.id === firstId || c.id === secondId ? { ...c, flipped: false } : c))
@@ -177,9 +140,6 @@ export default function App() {
             )}
           </div>
 
-          {/* flex-centred in CSS so the grid sits in the same visual
-              centre of the screen regardless of how many rows the
-              current difficulty needs (see .board in App.css) */}
           <div className={`board ${boardBlurred ? "is-blurred" : ""}`}>
             <Board
               key={gameId}
@@ -191,8 +151,6 @@ export default function App() {
             />
           </div>
 
-          {/* Lives outside .board on purpose — see the comment on
-              .status-text in App.css for why. */}
           <p className="status-text">{statusText}</p>
         </>
       )}

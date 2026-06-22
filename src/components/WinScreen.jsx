@@ -17,7 +17,7 @@ export default function WinScreen({ result, onPlayAgain, onQuit }) {
       </div>
       <button className="primary-button action-gap" onClick={onPlayAgain}>
         <i className="ti ti-player-play" aria-hidden="true"></i>
-        Play again
+        Play Again
       </button>
       <button className="secondary-button secondary-button--compact" onClick={onQuit}>
         <i className="ti ti-home" aria-hidden="true"></i>

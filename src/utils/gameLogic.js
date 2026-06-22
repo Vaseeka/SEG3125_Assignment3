@@ -10,7 +10,8 @@ export function shuffle(array) {
   return a;
 }
 
-// Picks different image pools each time since more images than pairs
+// Picks from different image pools each time since there are 
+// more images than maximum possible pairs
 function sampleImages(pool, count) {
   return shuffle(pool).slice(0, count);
 }
